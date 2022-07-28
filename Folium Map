@@ -1,0 +1,87 @@
+!pip3 install folium
+!pip3 install wget
+import folium
+import wget
+import pandas as pd
+
+# Import folium MarkerCluster plugin
+from folium.plugins import MarkerCluster
+# Import folium MousePosition plugin
+from folium.plugins import MousePosition
+# Import folium DivIcon plugin
+from folium.features import DivIcon
+
+# Download and read the NREL API
+alt_fuel_file = wget.download('https://api/alt-fuel-stations/v1.format?parameters')
+alt_fuel_df=pd.read_csv(alt_fuel_file)
+
+# Select relevant sub-columns: `col1`, `col2`, `col3`, `col4`
+alt_fuel_df = alt_fuel_df[['col1', 'col2', 'col3', 'col4']]
+station_sites_df = alt_fuel_df.groupby(['col1'], as_index=False).first()
+station_sites_df = station_sites_df[['col1', 'col2', 'col3']]
+station_sites_df
+
+# Start location is Oakland California
+oakland_coordinate = [lat, lon]
+site_map = folium.Map(location=oakland_coordinate, zoom_start=10)
+
+# Create a blue circle at Oakland's coordinate with a popup label showing its name
+circle = folium.Circle(oakland_coordinate, radius=1000, color='#d35400', fill=True).add_child(folium.Popup('Oakland, California'))
+# Create a blue circle at Oakland's coordinate with a icon showing its name
+marker = folium.map.Marker(
+    oakland_coordinate,
+    # Create an icon as a text label
+    icon=DivIcon(
+        icon_size=(20,20),
+        icon_anchor=(0,0),
+        html='<div style="font-size: 12; color:#d35400;"><b>%s</b></div>' % 'Oakland',
+        )
+    )
+site_map.add_child(circle)
+site_map.add_child(marker)
+
+
+#The following is template code--------------------------------------------------------------------------------------
+#Coordinate circle addition template and coordinate input.
+#(launch location) = [lat, long]
+#site_map = folium.Map(location=(launch location), zoom_start=10)
+#folium.Circle(coordinate, radius=1000, color='#000000', fill=True).add_child(folium.Popup(...))
+#folium.map.Marker(coordinate, icon=DivIcon(icon_size=(20,20),icon_anchor=(0,0), html='<div style="font-size: 12; color:#d35400;"><b>%s</b></div>' % 'label', ))
+#Our different launch sites, commented so that it doesn't ruin the code
+#CCAFS LC-40
+#KSC LC-39A
+#VAFB SLC-4E
+#Popup is the only differently named variable
+# Initializing the map
+site_map = folium.Map(location=nasa_coordinate, zoom_start=5)
+# For each launch site, add a Circle object based on its coordinate (Lat, Long) values. In addition, add Launch site name as a popup label
+for index, row in launch_sites_df.iterrows():
+    coordinate = [row['Lat'], row['Long']]
+    folium.Circle(coordinate, radius=1000, color='#000000', fill=True).add_child(folium.Popup(row['Launch Site'])).add_to(site_map)
+    folium.map.Marker(coordinate, icon=DivIcon(icon_size=(20,20),icon_anchor=(0,0), html='<div style="font-size: 12; color:#d35400;"><b>%s</b></div>' % row['Launch Site'], )).add_to(site_map)
+site_map
+
+
+#The following code was my first brute force attempt at this. Obviously the other solution is more elegant.
+#We want the computer to do the work, not me.
+#cape_canaveral = [28.562106, 80.577180]
+#site_map = folium.Map(location=cape_canaveral, zoom_start=10) 
+#folium.Circle(cape_canaveral, radius=1000, color='#000000', fill=True).add_child(folium.Popup('Cape Canaveral Space Launch Complex'))
+#folium.map.Marker(cape_canaveral, icon=DivIcon(icon_size=(20,20),icon_anchor=(0,0), html='<div style="font-size: 12; color:#d35400;"><b>%s</b></div>' % 'Cape Canaveral', ))
+#site_map.add_child(circle)
+#site_map.add_child(marker)
+
+#kennedy_space = [28.608389, -80.604333]
+#site_map = folium.Map(location=kennedy_space, zoom_start=10)
+#folium.Circle(kennedy_space, radius=1000, color='#000000', fill=True).add_child(folium.Popup('Kennedy Space Center Launch Complex'))
+#folium.map.Marker(kennedy_space, icon=DivIcon(icon_size=(20,20),icon_anchor=(0,0), html='<div style="font-size: 12; color:#d35400;"><b>%s</b></div>' % 'Kennedy SC', ))
+#site_map.add_child(circle)
+#site_map.add_child(marker)
+
+#vandenberg_space = [34.633, -120.613]
+#site_map = folium.Map(location=vandenberg_space, zoom_start=10) 
+#folium.Circle(vandenberg_space, radius=1000, color='#000000', fill=True).add_child(folium.Popup('Vandenberg Space Launch Complex'))
+#folium.map.Marker(vandenberg_space, icon=DivIcon(icon_size=(20,20),icon_anchor=(0,0), html='<div style="font-size: 12; color:#d35400;"><b>%s</b></div>' % 'Vandenberg SLC', ))
+#site_map.add_child(circle)
+#site_map.add_child(marker)
+#End Template Code -----------------------------------------------------------------------------------------------------------------------
