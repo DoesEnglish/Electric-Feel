@@ -1,3 +1,7 @@
+#This is currently an incomplete Folium generator for use with the NREL API listing electric vehicle charge stations across America and select spots in Canada. 
+#The purpose of this project is to create something useable for those of us with EVs in planning trips, routes, and even just finding a dang charger in our own cities. 
+#The rise of popularity in EVs is only a good thing for Earth. Ideally our public transportation would be more robust, but until then an EV isn't the worst thing by far. 
+#Enjoy. 
 !pip3 install folium
 !pip3 install wget
 import folium
@@ -11,9 +15,13 @@ from folium.plugins import MousePosition
 # Import folium DivIcon plugin
 from folium.features import DivIcon
 
-# Download and read the NREL API
-alt_fuel_file = wget.download('https://api/alt-fuel-stations/v1.format?parameters')
-alt_fuel_df=pd.read_csv(alt_fuel_file)
+# Download and read the NREL API. You need to have your own NREL API key. Please see the following link to create your own key.
+# https://developer.nrel.gov/signup/
+# The format of the request is outlined here if you can't find it.
+# https://developer.nrel.gov/docs/api-key/
+
+ev_csv_file = wget.download('https://developer.nrel.gov/api/alt-fuel-stations/v1.json?limit=1&api_key=YOUR-KEY-GOES-HERE')
+ev_df=pd.read_csv(ev_csv_file)
 
 # Select relevant sub-columns: `col1`, `col2`, `col3`, `col4`
 alt_fuel_df = alt_fuel_df[['col1', 'col2', 'col3', 'col4']]
@@ -41,7 +49,7 @@ site_map.add_child(circle)
 site_map.add_child(marker)
 
 
-#The following is template code--------------------------------------------------------------------------------------
+#THE FOLLOWING IS A TEMPLATE OF CODE------------------------------------------------------------------------------------------------------------------------------
 #Coordinate circle addition template and coordinate input.
 #(launch location) = [lat, long]
 #site_map = folium.Map(location=(launch location), zoom_start=10)
@@ -84,4 +92,8 @@ site_map
 #folium.map.Marker(vandenberg_space, icon=DivIcon(icon_size=(20,20),icon_anchor=(0,0), html='<div style="font-size: 12; color:#d35400;"><b>%s</b></div>' % 'Vandenberg SLC', ))
 #site_map.add_child(circle)
 #site_map.add_child(marker)
-#End Template Code -----------------------------------------------------------------------------------------------------------------------
+
+#END TEMPLATE CODE-----------------------------------------------------------------------------------------------------------------------
+
+
+
